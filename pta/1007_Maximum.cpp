@@ -2,8 +2,9 @@
 #include<vector>
 using namespace std;
 
+// -1
 int main() {
-	int K;
+	int K = 0;
 	cin >> K;
 	vector<int> nums;
 	for (int i = 0; i < K; i++) {
@@ -13,9 +14,10 @@ int main() {
 	}
 	int Maxsum = 0;
 	int temp = 0;
-	int begin, end;
+	int ibegin = 0;
+	int iend = 0;
 	int tempbegin = 0;
-	for (int i = 0; i < nums.size();i++) {
+	for (int i = 0; i < K;i++) {
 		temp += nums[i];
 		if (temp < 0) {
 			temp = 0;
@@ -24,14 +26,13 @@ int main() {
 		else {
 			if (temp > Maxsum)
 			{
-				begin = nums[tempbegin];
+				ibegin = nums[tempbegin];
 				Maxsum = temp;
-				end = nums[i];
+				iend = nums[i];
 			}
 		}
 	}
-	cout << Maxsum <<" "<<begin << " "<< end << endl;
+	cout << Maxsum <<" "<<ibegin << " "<< iend << endl;
 	nums.clear();
-	
 	return 0;
 }
