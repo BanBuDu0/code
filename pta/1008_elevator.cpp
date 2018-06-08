@@ -1,6 +1,14 @@
 #include<iostream>
 using namespace std;
 
+/*
+input 
+3 2 3 1
+*/
+/*
+output
+41
+*/
 //-1
 int main() {
 	int N;
@@ -17,7 +25,8 @@ int main() {
 		}
 		int time1 = allAction[0] * 6 + 5;
 		if (N == 1) {
-			cout << time1;
+			cout << time1 << endl;
+			exit(0);
 		}
 		else {
 			for (int i = 1; i < N; i++) {
@@ -30,11 +39,8 @@ int main() {
 				}
 				time += 5;
 			}
+			time += time1;
+		    cout << time << endl;
 		}
-		time += time1;
-		cout << time << endl;
-		return 0;
 	}
-	
-
 }
