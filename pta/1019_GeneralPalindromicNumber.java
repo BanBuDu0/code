@@ -3,7 +3,6 @@ import java.util.List;
 import java.util.Scanner;
 
 
-// -2
 class GeneralPalindromicNumber {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
@@ -24,6 +23,7 @@ class GeneralPalindromicNumber {
 			if (reside.get(i) != reside.get(j)) {
 				System.out.println("No");
 				flag = 0;
+				break;//如果不break;可能会打印多个No
 			}
 		}
 		if (flag == 1) {
