@@ -14,11 +14,6 @@ output
 // -1
 int main() {
 	int K = 0;
-	/* If all the K numbers are negative, then its maximum sum is defined 
-	to be 0, and you are supposed to output the first and the last numbers
-	 of the whole sequence.
-	*/
-	//use the flag to sign if all the K numbers are negative.
 	int flag = 0;
 	cin >> K;
 	vector<int> nums;
