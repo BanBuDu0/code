@@ -15,7 +15,6 @@ void op(int c) {
 		cout << c;
 	}
 }
-
 int main() {
 	int color[3];
 	cin >> color[0] >> color[1] >> color[2];
