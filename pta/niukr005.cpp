@@ -2,6 +2,7 @@
 #include<vector>
 using namespace std;
 
+//pat 运行超时，使用scanf和printf 代替 cin, cout
 int moore(vector<int>& nums) {
     int m;
     int count = 0;
