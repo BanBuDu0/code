@@ -33,6 +33,7 @@ int main(int argc, char const *argv[]) {
         getchar();
         getline(cin, books[i].title, '\n');
         getline(cin, books[i].author, '\n');
+        // keyWord may more than one line
         do {
         	cin >> s;
         	temp += s;
