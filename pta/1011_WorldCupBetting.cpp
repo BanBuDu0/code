@@ -7,6 +7,7 @@
 T T W 37.98
 */
 #include<iostream>
+#include<stdio.h>
 using namespace std;
 
 struct map {
