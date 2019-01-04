@@ -1,42 +1,33 @@
-int inGroup(char* s, char c, int left, int right){
-    int i = left;
-    while(i < right){
-        if(s[i] == c){
-            return 1;
-        }
-        ++i;
+#include<stdio.h>
+#include<string.h>
+int max(int i, int j){
+    if(i > j){
+        return i;
+    }else{
+        return j;
     }
-    return 0;
-
 }
 int lengthOfLongestSubstring(char* s) {
-    int i = 0;
-    int left = i;
+    int count[256] = {[0 ... 255] = -1};
     int len = strlen(s);
+    int left = 0, right = 0;
+    int res = 0;
     if(len == 0){
         return 0;
     }else{
-        int count = 1;
-        int j, flag;
-        while(i < len){
-            int s_cont = 1;
-            left = i;
-            j = i + 1;
-            while(j < len){
-                flag = inGroup(s, s[j], left, j);
-                if(flag == 0){
-                    ++s_cont;
-                }else{
-                    break;
-                }
-                ++j;
-            }
-            if(s_cont > count){
-                count = s_cont;
-            }
-            ++i;
+        for(right; right < len; right++){
+            left = max(count[s[right]], left);
+            res = max(res, right - left + 1);
+            count[s[right]] = right + 1;
+
         }
-        return count;
-        
-    } 
+    }
+    return res;
+}
+
+
+int main(){
+    char s[10] = {'a', 'b', 'c', 'a', 'b', 'c', 'b', 'b'};
+    int i = lengthOfLongestSubstring(s);
+    printf("%d", i);
 }
