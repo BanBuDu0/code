@@ -70,12 +70,12 @@ public class Main {
             PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
             int n = matrix.length;
             for (int i = 0; i < n; i++) {
-                pq.offer(new int[] { matrix[i][0], i, 0 });
+                pq.offer(new int[]{matrix[i][0], i, 0});
             }
             for (int i = 0; i < k - 1; i++) {
                 int[] now = pq.poll();
                 if (now[2] != n - 1) {
-                    pq.offer(new int[] { matrix[now[1]][now[2] + 1], now[1], now[2] + 1 });
+                    pq.offer(new int[]{matrix[now[1]][now[2] + 1], now[1], now[2] + 1});
                 }
             }
             return pq.poll()[0];
@@ -276,7 +276,7 @@ public class Main {
             }
 
             if (shorter == longer) {
-                return new int[] { longer * k };
+                return new int[]{longer * k};
             }
             int[] res = new int[k + 1];
             for (int i = 0; i <= k; ++i) {
@@ -339,7 +339,6 @@ public class Main {
          * 1. dp[i][0] 持有一直股票
          * 2. dp[i][1] 不持有股票且处于冷冻期
          * 3. dp[i][2] 不持有股票且不处于冷冻期
-         * 
          */
         public int maxProfit(int[] prices) {
             if (prices.length == 0) {
@@ -349,7 +348,7 @@ public class Main {
             int len = prices.length;
             int[][] dp = new int[len][3];
             dp[0][0] = -prices[0];
-            for(int i = 1; i < len; ++i){
+            for (int i = 1; i < len; ++i) {
                 //dp[i - 1][0]表示该股票为i-1天就持有的，dp[i - 1][2] - prices[i]表示第i天新买入的股票
                 dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][2] - prices[i]);
                 //dp[i][1] 表示不持有股票且处于冷冻期，说明第i天卖掉了股票
@@ -362,12 +361,36 @@ public class Main {
             return Math.max(dp[len - 1][1], dp[len - 1][2]);
         }
 
+        /**
+         * 174. 地下城游戏
+         * 设dp[i][j]为i，j到终点所需的最小距离
+         * 这道题正向dp会出错，因为正向dp没有满足无后效性
+         *
+         * @param dungeon dungeon
+         * @return int
+         */
+        public int calculateMinimumHP(int[][] dungeon) {
+            int n = dungeon.length, m = dungeon[0].length;
+            int[][] dp = new int[n + 1][m + 1];
+            for (int i = 0; i <= n; ++i) {
+                Arrays.fill(dp[i], Integer.MAX_VALUE);
+            }
+            dp[n][m - 1] = dp[n - 1][m] = 1;
+            for (int i = n - 1; i >= 0; --i) {
+                for (int j = m - 1; j >= 0; --j) {
+                    int temp = Math.min(dp[i + 1][j], dp[i][j + 1]);
+                    dp[i][j] = Math.max(temp - dungeon[i][j], 1);
+                }
+            }
+            return dp[0][0];
+        }
+
     }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
         // int[][] a = {{1, 0}};
-        String[] a = { "dog", "racecar", "car" };
+        String[] a = {"dog", "racecar", "car"};
         System.out.println(solution.longestCommonPrefix(a));
     }
 }
