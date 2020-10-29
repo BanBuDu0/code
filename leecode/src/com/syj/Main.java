@@ -1,7 +1,5 @@
 package com.syj;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.util.*;
 
 public class Main {
@@ -387,103 +385,99 @@ public class Main {
             return dp[0][0];
         }
 
+
         /**
-         * 120. 三角形最小路径和
-         *
-         * @param triangle
-         * @return
+         * 51. N 皇后
+         * 经典回溯求解
          */
-        public int minimumTotal(List<List<Integer>> triangle) {
-            int n = triangle.size();
-            int[][] dp = new int[n][n];
-            dp[0][0] = triangle.get(0).get(0);
-            for (int i = 1; i < n; ++i) {
-                dp[i][0] = dp[i - 1][0] + triangle.get(i).get(0);
-                for (int j = 1; j < i; ++j) {
-                    dp[i][j] = Math.min(dp[i - 1][j - 1], dp[i - 1][j]) + triangle.get(i).get(j);
-                }
-                dp[i][i] = dp[i - 1][i - 1] + triangle.get(i).get(i);
-            }
-            int minTotal = dp[n - 1][0];
-            for (int i = 1; i < n; ++i) {
-                minTotal = Math.min(minTotal, dp[n - 1][i]);
-            }
-            return minTotal;
+        public List<List<String>> result = new ArrayList<>();
+
+        public List<List<String>> solveNQueens(int n) {
+            List<Integer> road = new ArrayList<>();
+            backtrack(road, n, 0);
+            return result;
         }
 
         /**
-         * 785. 判断二分图
+         * 根据  road 画出棋盘
          *
-         * @param graph graph
-         * @return boolean
+         * @param road 保持皇后所在列，列的index就是皇后所在行
+         * @param n    期盼大小
          */
-        public boolean isBipartite(int[][] graph) {
-            int UNVISITED = 0, RED = 1, GREEN = 2;
-            int n = graph.length;
-            boolean res = true;
-            int[] colors = new int[n];
-            Arrays.fill(colors, UNVISITED);
-            for (int i = 0; i < n; ++i) {
-                if (colors[i] == UNVISITED) {
-                    Queue<Integer> queue = new LinkedList<>();
-                    queue.offer(i);
-                    colors[i] = RED;
-                    while (!queue.isEmpty()) {
-                        int node = queue.poll();
-                        int tempColor = colors[node] == RED ? GREEN : RED;
-                        for (int neighbor : graph[node]) {
-                            if (colors[neighbor] == UNVISITED) {
-                                queue.offer(neighbor);
-                                colors[neighbor] = tempColor;
-                            } else if (colors[neighbor] != tempColor) {
-                                return false;
-                            }
-                        }
+        public void addToResult(List<Integer> road, int n) {
+            List<String> tempString = new ArrayList<>();
+            for (int row = 0; row < n; ++row) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int column = 0; column < n; ++column) {
+                    if (column == road.get(row)) {
+                        stringBuilder.append('Q');
+                    } else {
+                        stringBuilder.append('.');
                     }
+                }
+                tempString.add(stringBuilder.toString());
+            }
+            result.add(tempString);
+            System.out.println(tempString);
+        }
+
+        /**
+         * 判断传入的row和column这个位置能不能放皇后
+         *
+         * @param road   road
+         * @param row    row
+         * @param column column
+         * @param n      n
+         * @return bool
+         */
+        public boolean validColumn(List<Integer> road, int row, int column, int n) {
+            if (road.contains(column)) {
+                return false;
+            }
+            for (int i = row - 1, j = column - 1; i >= 0 && j >= 0; i--, j--) {
+                if (road.contains(j) && road.indexOf(j) == i) {
+                    return false;
+                }
+            }
+
+            for (int i = row - 1, j = column + 1; i >= 0 && j < n; i--, j++) {
+                if (road.contains(j) && road.indexOf(j) == i) {
+                    return false;
                 }
             }
             return true;
         }
 
-        /**
-         * 97. 交错字符串
-         * 给定三个字符串 s1, s2, s3, 验证 s3 是否是由 s1 和 s2 交错组成的。
-         * 使用dp求解
-         * dp[i][j]，表示s3的前i + j个字符是否有s1的前i个字符和s2的前j个字符组成
-         *
-         * @param s1
-         * @param s2
-         * @param s3
-         * @return
-         */
-        public boolean isInterleave(String s1, String s2, String s3) {
-            int n = s1.length(), m = s2.length(), l = s3.length();
-            if (n + m != l) {
-                return false;
-            }
-            boolean[][] dp = new boolean[n + 1][m + 1];
-            dp[0][0] = true;
-            for (int i = 0; i <= n; ++i) {
-                for (int j = 0; j <= m; ++j) {
-                    int p = i + j - 1;
-                    if (i > 0) {
-                        dp[i][j] = dp[i][j] || (dp[i - 1][j] && s1.charAt(i - 1) == s3.charAt(p));
-                    }
-                    if (j > 0) {
-                        dp[i][j] = dp[i][j] || (dp[i][j - 1] && s2.charAt(j - 1) == s3.charAt(p));
-                    }
 
-                }
+        /**
+         * N 皇后回溯框架
+         *
+         * @param road road
+         * @param n    n
+         * @param row  row
+         */
+        public void backtrack(List<Integer> road, int n, int row) {
+            if (row == n) { // 1. 如果满足条件
+                addToResult(road, n);  //2 .添加路径
+                return; // 3. 返回
             }
-            return dp[n][m];
+            for (int column = 0; column < n; ++column) {  // 4. for 选择 in 选择列表
+                boolean flag = validColumn(road, row, column, n);  //5. 做选择
+                if (!flag) {
+                    continue;
+                }
+                road.add(column);
+                backtrack(road, n, row + 1); //6. 回溯
+                road.remove(road.indexOf(column)); //7. 撤销选择
+            }
         }
 
     }
 
+
     public static void main(String[] args) {
         Solution solution = new Solution();
-        // int[][] a = {{1, 0}};
-        String[] a = {"dog", "racecar", "car"};
-        System.out.println(solution.longestCommonPrefix(a));
+        solution.solveNQueens(4);
+
     }
 }
