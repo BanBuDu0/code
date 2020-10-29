@@ -1,5 +1,6 @@
 package com.syj;
 
+import javax.swing.*;
 import java.util.*;
 
 public class Main {
@@ -385,12 +386,99 @@ public class Main {
             return dp[0][0];
         }
 
+
+        /**
+         * 51. N 皇后
+         * 经典回溯求解
+         */
+        public List<List<String>> result = new ArrayList<>();
+
+        public List<List<String>> solveNQueens(int n) {
+            List<Integer> road = new ArrayList<>();
+            backtrack(road, n, 0);
+            return result;
+        }
+
+        /**
+         * 根据  road 画出棋盘
+         *
+         * @param road 保持皇后所在列，列的index就是皇后所在行
+         * @param n    期盼大小
+         */
+        public void addToResult(List<Integer> road, int n) {
+            List<String> tempString = new ArrayList<>();
+            for (int row = 0; row < n; ++row) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int column = 0; column < n; ++column) {
+                    if (column == road.get(row)) {
+                        stringBuilder.append('Q');
+                    } else {
+                        stringBuilder.append('.');
+                    }
+                }
+                tempString.add(stringBuilder.toString());
+            }
+            result.add(tempString);
+            System.out.println(tempString);
+        }
+
+        /**
+         * 判断传入的row和column这个位置能不能放皇后
+         *
+         * @param road   road
+         * @param row    row
+         * @param column column
+         * @param n      n
+         * @return bool
+         */
+        public boolean validColumn(List<Integer> road, int row, int column, int n) {
+            if (road.contains(column)) {
+                return false;
+            }
+            for (int i = row - 1, j = column - 1; i >= 0 && j >= 0; i--, j--) {
+                if (road.contains(j) && road.indexOf(j) == i) {
+                    return false;
+                }
+            }
+
+            for (int i = row - 1, j = column + 1; i >= 0 && j < n; i--, j++) {
+                if (road.contains(j) && road.indexOf(j) == i) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        /**
+         * N 皇后回溯框架
+         *
+         * @param road road
+         * @param n    n
+         * @param row  row
+         */
+        public void backtrack(List<Integer> road, int n, int row) {
+            if (row == n) { // 1. 如果满足条件
+                addToResult(road, n);  //2 .添加路径
+                return; // 3. 返回
+            }
+            for (int column = 0; column < n; ++column) {  // 4. for 选择 in 选择列表
+                boolean flag = validColumn(road, row, column, n);  //5. 做选择
+                if (!flag) {
+                    continue;
+                }
+                road.add(column);
+                backtrack(road, n, row + 1); //6. 回溯
+                road.remove(road.indexOf(column)); //7. 撤销选择
+            }
+        }
+
     }
+
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        // int[][] a = {{1, 0}};
-        String[] a = {"dog", "racecar", "car"};
-        System.out.println(solution.longestCommonPrefix(a));
+        solution.solveNQueens(4);
+
     }
 }
