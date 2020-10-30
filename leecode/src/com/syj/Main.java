@@ -466,18 +466,44 @@ public class Main {
                 if (!flag) {
                     continue;
                 }
-                road.add(column);
+                road.add(column);  //5. 做选择
                 backtrack(road, n, row + 1); //6. 回溯
                 road.remove(road.indexOf(column)); //7. 撤销选择
             }
         }
 
+        /**
+         * 全排列，回溯解法
+         */
+//        List<List<Integer>> result = new ArrayList<>();
+//
+//        public List<List<Integer>> permute(int[] nums) {
+//            List<Integer> arrange = new ArrayList<>();
+//            backtrack(nums, arrange);
+//            System.out.println(result);
+//            return result;
+//        }
+//
+//        public void backtrack(int[] nums, List<Integer> arrange) {
+//            if (arrange.size() == nums.length) {
+//                result.add(new ArrayList<>(arrange));
+//                return;
+//            }
+//
+//            for (int num : nums) {
+//                if (arrange.contains(num)) {
+//                    continue;
+//                }
+//                arrange.add(num);
+//                backtrack(nums, arrange);
+//                arrange.remove(arrange.indexOf(num));
+//            }
+//        }
     }
 
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        solution.solveNQueens(4);
 
     }
 }
