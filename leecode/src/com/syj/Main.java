@@ -499,11 +499,58 @@ public class Main {
 //                arrange.remove(arrange.indexOf(num));
 //            }
 //        }
+        public String minWindow(String s, String t) {
+            //窗口大小使用right - left来表示
+            //window保存的是窗口内涵盖t的字符数
+            //valid表示window和need匹配的字符数
+            int[] needs = new int[128];
+            for (int i = 0; i < t.length(); ++i) {
+                ++needs[t.charAt(i)];
+            }
+            int totalVaryChar = 0;
+            for (int i : needs) {
+                if(i != 0){
+                    totalVaryChar++;
+                }
+            }
+            int[] window = new int[128];
+            int left = 0, right = 0, valid = 0;
+            int start = 0, subStrLen = 100001;
+            while (right < s.length()) {
+                char validChar = s.charAt(right);
+                right++;
+
+                if (needs[validChar] != 0) {
+                    window[validChar]++;
+                    if (window[validChar] == needs[validChar]) {
+                        valid++;
+                    }
+                }
+
+                while (valid == totalVaryChar) {
+                    if (right - left < subStrLen) {
+                        start = left;
+                        subStrLen = right - left;
+                    }
+
+                    char removeChar = s.charAt(left);
+                    left++;
+
+                    if (needs[removeChar] != 0) {
+                        if (window[removeChar] == needs[removeChar]) {
+                            valid--;
+                        }
+                        window[removeChar]--;
+                    }
+                }
+            }
+            return subStrLen == 100001 ? "" : s.substring(start, start + subStrLen);
+        }
     }
 
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-
+        System.out.println(solution.minWindow("ADOBECODEBANC", "ABC"));
     }
 }
