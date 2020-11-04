@@ -476,7 +476,7 @@ public class Main {
          * 全排列，回溯解法
          */
 //        List<List<Integer>> result = new ArrayList<>();
-//
+////
 //        public List<List<Integer>> permute(int[] nums) {
 //            List<Integer> arrange = new ArrayList<>();
 //            backtrack(nums, arrange);
@@ -499,17 +499,26 @@ public class Main {
 //                arrange.remove(arrange.indexOf(num));
 //            }
 //        }
+
+        /**
+         * 滑动窗口
+         *
+         * @param s
+         * @param t
+         * @return
+         */
         public String minWindow(String s, String t) {
             //窗口大小使用right - left来表示
             //window保存的是窗口内涵盖t的字符数
             //valid表示window和need匹配的字符数
+            //最小的窗口使用start和subStrLen来保存
             int[] needs = new int[128];
             for (int i = 0; i < t.length(); ++i) {
                 ++needs[t.charAt(i)];
             }
             int totalVaryChar = 0;
             for (int i : needs) {
-                if(i != 0){
+                if (i != 0) {
                     totalVaryChar++;
                 }
             }
@@ -546,11 +555,111 @@ public class Main {
             }
             return subStrLen == 100001 ? "" : s.substring(start, start + subStrLen);
         }
+
+        public boolean checkInclusion(String s1, String s2) {
+            int[] needs = new int[128];
+            int[] window = new int[128];
+            int left = 0, right = 0, valid = 0;
+            int start = 0, len = 10001;
+            int diff = 0;
+            for (int i = 0; i < s1.length(); ++i) {
+                if (needs[s1.charAt(i)] == 0) {
+                    diff++;
+                }
+                needs[s1.charAt(i)]++;
+            }
+
+            while (right < s2.length()) {
+                char inWindow = s2.charAt(right);
+                right++;
+
+                //右移窗口之后更新参数
+                if (needs[inWindow] != 0) {
+                    window[inWindow]++;
+                    if (window[inWindow] == needs[inWindow]) {
+                        ++valid;
+                    }
+                }
+                //判断窗口什么时候收缩
+                while (right - left >= s1.length()) {
+                    //判断是否找到了合法的字串
+                    if (valid == diff) {
+                        return true;
+                    }
+                    char outWindow = s2.charAt(left);
+                    ++left;
+                    if (needs[outWindow] != 0) {
+                        if (window[outWindow] == needs[outWindow]) {
+                            --valid;
+                        }
+                        window[outWindow]--;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public List<Integer> findAnagrams(String s, String p) {
+            List<Integer> result = new ArrayList<>();
+            int[] need = new int[128];
+            int[] window = new int[128];
+            int left = 0, right = 0, vaild = 0, diff = 0;
+            for (int i = 0; i < p.length(); ++i) {
+                if (need[p.charAt(i)] == 0) {
+                    diff++;
+                }
+                need[p.charAt(i)]++;
+            }
+            while (right < s.length()) {
+                char in = s.charAt(right);
+                right++;
+                if (need[in] != 0) {
+                    window[in]++;
+                    if (window[in] == need[in]) {
+                        vaild++;
+                    }
+                }
+
+                while (right - left >= p.length()) {
+                    if (vaild == diff && right - left == p.length()) {
+                        result.add(left);
+                    }
+
+                    char out = s.charAt(left);
+                    left++;
+
+                    if (need[out] != 0) {
+                        if (window[out] == need[out]) {
+                            vaild--;
+                        }
+                        window[out]--;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public int lengthOfLongestSubstring1(String s) {
+            int left = 0, right = 0;
+            int[] window = new int[128];
+            int res = 0;
+            while (right < s.length()) {
+                char in = s.charAt(right++);
+                window[in]++;
+                System.out.println("window: [" + left + ", " + right + "], " + s.substring(left, right));
+                while (window[in] > 1) {
+                    char out = s.charAt(left++);
+                    window[out]--;
+                }
+                res = Math.max(res, right - left);
+            }
+            return res;
+        }
     }
 
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        System.out.println(solution.minWindow("ADOBECODEBANC", "ABC"));
+        System.out.println(solution.lengthOfLongestSubstring1("pwwkew"));
     }
 }
