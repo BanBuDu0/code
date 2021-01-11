@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class Main {
 
@@ -733,22 +734,480 @@ public class Main {
             }
             return res;
         }
+
+        private Map<TreeNode, Integer> mem = new HashMap<>();
+
+        public int rob(TreeNode root) {
+            if (root == null) {
+                return 0;
+            }
+            if (mem.containsKey(root)) {
+                return mem.get(root);
+            }
+
+            int do_it = root.val
+                    + (root.left == null ? 0 : rob(root.left.left) + rob(root.left.right))
+                    + (root.right == null ? 0 : rob(root.right.left) + rob(root.right.right));
+            int not_do_it = rob(root.left) + rob(root.right);
+            int res = Math.max(do_it, not_do_it);
+            mem.put(root, res);
+            return res;
+        }
+
+        public String Probability(int n) {
+            // write code here
+            double res = 1.0;
+            for (int i = 0; i < n; ++i) {
+                res *= 2;
+            }
+            res = 2 / res;
+            String b = "" + res;
+            int len = b.length();
+            if (len < 4) {
+                for (int i = len; i <= 4; ++i) {
+                    b += "0";
+                }
+            }
+            int t = b.charAt(4) - '0';
+            if (t >= 5) {
+                String p = b.charAt(3) + 1 - '0' + "";
+                String p1 = b.substring(0, 3);
+                return p1 + p;
+            }
+
+            return b.substring(0, 4);
+        }
+
+//        void QuickSort(int[] A, int low, int high) {
+//            if (low < high) {
+//                int piv = Partition(A, low, high);
+//                QuickSort(A, low, piv - 1);
+//                QuickSort(A, piv + 1, high);
+//            }
+//        }
+//
+//        int Partition(int[] A, int low, int high) {
+//            int temp = A[low];
+//            while (low < high) {
+//                while (low < high && A[high] >= temp) {
+//                    --high;
+//                }
+//                A[low] = A[high];
+//                while (low < high && A[low] <= temp) {
+//                    ++low;
+//                }
+//                A[high] = A[low];
+//            }
+//            A[low] = temp;
+//            return low;
+//        }
+
+        public int Answerofjudge(int[] arr) {
+            // write code here
+            int len = arr.length;
+            double avg = Arrays.stream(arr).sum() / (double) len;
+            Arrays.sort(arr);
+            double mi = arr[len / 2];
+            if (len % 2 == 0) {
+                mi += arr[(len / 2) - 1];
+                mi /= 2.0;
+            }
+            if (mi == avg) {
+                return 0;
+            }
+            return mi > avg ? 1 : -1;
+        }
+
+        public int Maximumlength(String x) {
+            // write code here
+            int len = x.length();
+            int[] count = new int[26];
+            int left = 0, right = 0;
+            int window = 0;
+            int res = 0;
+            while (right < len) {
+                char cur = x.charAt(right);
+                count[cur - 'a']++;
+                right++;
+                window++;
+                System.out.println("window: " + left + " " + right);
+
+                while (count['n' - 'a'] > 0 && count['p' - 'a'] > 0 && count['y' - 'a'] > 0 && window > 0) {
+                    char out = x.charAt(left);
+                    window--;
+                    left++;
+                    count[out - 'a']--;
+                }
+                res = Math.max(res, window);
+            }
+            return res;
+        }
+
+        public long solve(String str) {
+            // write code here
+            long res = 0;
+            Stack<Long> s = new Stack<>();
+            int i = 0;
+            while (i < str.length()) {
+                char cur = str.charAt(i);
+                StringBuilder sb = new StringBuilder();
+                boolean flag = false;
+                while (cur != '+' && cur != '-' && cur != '*' && cur != '#') {
+                    sb.append(cur);
+                    i++;
+                    cur = str.charAt(i);
+                    flag = true;
+                }
+                if (flag) {
+                    s.push(Long.parseLong(sb.toString()));
+                    continue;
+                }
+
+                if (cur == '+') {
+                    long a2 = s.pop();
+                    long a1 = s.pop();
+                    res = a1 + a2;
+                    s.push(res);
+                }
+
+                if (cur == '-') {
+                    long a2 = s.pop();
+                    long a1 = s.pop();
+                    res = a1 - a2;
+                    s.push(res);
+                }
+
+                if (cur == '*') {
+                    long a2 = s.pop();
+                    long a1 = s.pop();
+                    res = a1 * a2;
+                    s.push(res);
+                }
+                i++;
+            }
+            return res;
+        }
+
+        int solve(int a, int b, int n) {
+            // write code here
+            if (n < a) {
+                return 0;
+            }
+            int p = n / a;
+            if (p == 1) {
+                if (b == 0) {
+                    return n;
+                } else {
+                    return 0;
+                }
+            } else {
+                if (p * a + b <= n) {
+                    return p * a + b;
+                }
+                return (p - 1) * a + b;
+            }
+        }
+
+        public int string2(int k, String s) {
+            // write code here
+            int len = s.length();
+            char[] ch = s.toCharArray();
+            Set<String> visited = new HashSet<>();
+            Queue<String> q = new LinkedList<>();
+            q.offer(new String(ch));
+            visited.add(new String(ch));
+            int res = 0;
+
+            int depth = 0;
+            while (!q.isEmpty()) {
+                int sz = q.size();
+                for (int i = 0; i < sz; ++i) {
+                    String cur = q.poll();
+                    res = Math.max(res, maxSame(cur));
+                    if (depth > k) {
+                        return res;
+                    }
+
+                    for (int j = 0; j < len; ++j) {
+                        String up = upCharJ(cur, j);
+                        if (!visited.contains(up)) {
+                            q.offer(up);
+                            visited.add(up);
+                        }
+
+                        String down = downCharJ(cur, j);
+                        if (!visited.contains(down)) {
+                            q.offer(down);
+                            visited.add(down);
+                        }
+                    }
+                }
+                depth++;
+            }
+            return -1;
+        }
+
+        public String upCharJ(String s, int j) {
+            char[] ch = s.toCharArray();
+            if (ch[j] != 'z') {
+                ch[j] += 1;
+            }
+            return new String(ch);
+        }
+
+        public String downCharJ(String s, int j) {
+            char[] ch = s.toCharArray();
+            if (ch[j] != 'a') {
+                ch[j] -= 1;
+            }
+            return new String(ch);
+        }
+
+
+        public int maxSame(String s) {
+            char[] temp = new char[26];
+            for (int i = 0; i < s.length(); ++i) {
+                temp[s.charAt(i) - 'a']++;
+            }
+            int res = 0;
+            for (int i = 0; i < temp.length; ++i) {
+                res = Math.max(res, temp[i]);
+            }
+            return res;
+        }
+
+        public int maxOperations(int[] nums, int k) {
+            Arrays.sort(nums);//先排序
+            int ans = 0, p = nums.length - 1;
+            //使用快排思想进行遍历计数
+            for (int i = 0; i < p; i++) {
+                while (i < p && nums[i] + nums[p] > k)//快速缩小数组遍历规模
+                {
+                    p--;
+                }
+                if (i >= p) {
+                    break;
+                }
+                if (nums[i] + nums[p] == k) {
+                    ans++;
+                    p--;
+                }
+            }
+            return ans;
+        }
+
+        public int Maximumlength1(String x) {
+            // write code here
+            int len = x.length();
+            int res = 0;
+            int[] f = new int[3];
+            int i = 0;
+            while (i < len) {
+                boolean flag = false;
+                while (i < len && x.charAt(i) == 'a') {
+                    f[0]++;
+                    i++;
+                    flag = true;
+                }
+                if (i < len && x.charAt(i) != 'b' && flag) {
+                    f[0] = 0;
+                    f[1] = 0;
+                    f[2] = 0;
+                    continue;
+                }
+                while (i < len && x.charAt(i) == 'b') {
+                    f[1]++;
+                    i++;
+                    flag = true;
+                }
+                if (i < len && x.charAt(i) != 'c' && flag) {
+                    f[0] = 0;
+                    f[1] = 0;
+                    f[2] = 0;
+                    continue;
+                }
+                while (i < len && x.charAt(i) == 'c') {
+                    f[2]++;
+                    i++;
+                    flag = true;
+                }
+
+                if (f[0] >= f[1] && f[2] >= f[1]) {
+                    res = Math.max(res, f[1] * 3);
+                }
+                f[0] = 0;
+                f[1] = 0;
+                f[2] = 0;
+                if (!flag) {
+                    ++i;
+                }
+
+            }
+            return res;
+        }
+
+        public int stoneGameVII(int[] stones) {
+            int len = stones.length;
+            int[][][] dp = new int[len][len][2];
+            for (int i = 1; i < len; ++i) {
+                dp[i - 1][i][0] = Math.max(stones[i], stones[i - 1]);
+            }
+            int[][] mem = new int[len][len];
+            for (int i = 0; i < len; ++i) {
+                int sum = stones[i];
+                mem[i][i] = sum;
+                for (int j = i + 1; j < len; ++j) {
+                    sum += stones[j];
+                    mem[i][j] = sum;
+                }
+            }
+            // dp[i][j][0] = max(mem[i+1][j]+dp[i+1][j][1], mem[i][j-1]+dp[i][j-1][1]);
+            for (int l = 3; l <= len; ++l) {
+                for (int i = 0; i <= len - l; ++i) {
+                    int j = l + i - 1;
+                    int left = mem[i + 1][j] + dp[i + 1][j][1];
+                    int left1 = dp[i + 1][j][0];
+                    int right = mem[i][j - 1] + dp[i][j - 1][1];
+                    int right1 = dp[i][j - 1][0];
+                    if (Math.abs(left1 - left) > Math.abs(right - right1)) {
+                        dp[i][j][0] = left;
+                        dp[i][j][1] = left1;
+                    } else {
+                        dp[i][j][0] = right;
+                        dp[i][j][1] = right1;
+                    }
+                }
+            }
+            Arrays.sort(dp, new Comparator<int[][]>() {
+                @Override
+                public int compare(int[][] o1, int[][] o2) {
+                    return 0;
+                }
+            });
+            return dp[0][len - 1][0] - dp[0][len - 1][1];
+        }
+
+        public int maxHeight(int[][] cuboids) {
+            int len = cuboids.length;
+            int[][] c = new int[len * 6][3];
+            for (int i = 0; i < len; ++i) {
+                c[i * 6 + 0][0] = cuboids[i][0];
+                c[i * 6 + 0][1] = cuboids[i][1];
+                c[i * 6 + 0][2] = cuboids[i][2];
+                c[i * 6 + 1][0] = cuboids[i][0];
+                c[i * 6 + 1][1] = cuboids[i][2];
+                c[i * 6 + 1][2] = cuboids[i][1];
+                c[i * 6 + 2][0] = cuboids[i][1];
+                c[i * 6 + 2][1] = cuboids[i][0];
+                c[i * 6 + 2][2] = cuboids[i][2];
+                c[i * 6 + 3][0] = cuboids[i][1];
+                c[i * 6 + 3][1] = cuboids[i][2];
+                c[i * 6 + 3][2] = cuboids[i][0];
+                c[i * 6 + 4][0] = cuboids[i][2];
+                c[i * 6 + 4][1] = cuboids[i][1];
+                c[i * 6 + 4][2] = cuboids[i][0];
+                c[i * 6 + 5][0] = cuboids[i][2];
+                c[i * 6 + 5][1] = cuboids[i][0];
+                c[i * 6 + 5][2] = cuboids[i][1];
+            }
+            Arrays.sort(c, (a, b) -> {
+                if (a[0] == b[0]) {
+                    return b[1] - a[1];
+                } else {
+                    return b[0] - a[0];
+                }
+            });
+            int[] dp = new int[len * 6];
+            int res = 0;
+            for (int i = 0; i < len * 6; ++i) {
+                dp[i] = c[i][2];
+                res = Math.max(res, dp[i]);
+                for (int j = 0; j < i; ++j) {
+                    if (c[i][0] <= c[j][0] && c[i][1] <= c[j][1] && Math.abs(j - i) > 5) {
+                        dp[i] = Math.max(dp[i], dp[j] + c[i][2]);
+                        res = Math.max(res, dp[i]);
+                    }
+                }
+            }
+            return res;
+        }
+
+        public int majorityElement(int[] nums) {
+            int len = nums.length;
+            if (len == 0) {
+                return 0;
+            }
+
+            int index = Partition(nums, 0, len - 1);
+            int middle = (nums.length >> 1);
+            while (index != middle) {
+                if (index > middle) {
+                    //res in left
+                    index = Partition(nums, 0, index - 1);
+                } else {
+                    // res in right
+                    index = Partition(nums, index + 1, len - 1);
+                }
+            }
+            return nums[index];
+        }
+
+        public int Partition(int[] nums, int left, int right) {
+            int temp = nums[left];
+            while (left < right) {
+                while (left < right && nums[right] >= temp) {
+                    --right;
+                }
+                nums[left] = nums[right];
+                while (left < right && nums[left] <= temp) {
+                    ++left;
+                }
+                nums[right] = nums[left];
+                ;
+            }
+            nums[left] = temp;
+            return left;
+        }
+
     }
 
     public static void main(String[] args) {
-        List<Integer> l = new ArrayList<>(10);
-        l.add(1);
-//        l.remove(l.get(l.size() - 1));
-//        l = Collections.synchronizedList(l);
-        Integer[] al = l.toArray(new Integer[0]);
-        System.out.println(al[0]);
-        Solution solution = new Solution();
-        String a = "aaaa";
-        a.trim();
-        Vector<Integer> v = new Vector<>();
+//        int[] a = new int[]{6, 6, 6, 6, 5, 8};
+//        //小顶堆
+//        PriorityQueue<Integer> q = new PriorityQueue<>((o1, o2) -> o1 - o2);
+//        //大顶堆
+//        PriorityQueue<Integer> q1 = new PriorityQueue<>((o1, o2) -> o2 - o1);
+//        //队列
+
+
+        //队列
+        Queue<Integer> arrayDeque = new ArrayDeque<>();
+        Queue<Integer> linkedListQueue = new LinkedList<>();
+
+        //双端队列
+        Deque<Integer> arrayDeque1 = new ArrayDeque<>();
         Deque<Integer> deque = new LinkedList<>();
         LinkedList<Integer> linkedList = new LinkedList<>();
-        int res = solution.reversePairs(new int[]{1, 3, 2, 3, 1});
-        System.out.println(res);
+
+        List<Integer> list = new ArrayList<>();
+        LinkedHashMap<Integer, String> linkedHashMap = new LinkedHashMap<>();
+
+        Map<Integer, Character> m = new TreeMap<>(Comparator.reverseOrder());
+        Map<Integer, Integer> map = new HashMap<>();
+        Map<Integer, Integer> hashTable = new Hashtable<>();
+
+        //集合
+        Set<Integer> set = new HashSet<>();
+        Set<Integer> treeSet = new TreeSet<>();
+        // 栈，继承自Vector，线程安全
+        Stack<Integer> stack = new Stack<>();
+        String string = new String("");
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Vector<Integer> v = new Vector<>();
+
+
+//        Solution solution = new Solution();
+//        System.out.println(solution);
     }
 }
