@@ -1,5 +1,8 @@
 package com.syj;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class Main {
@@ -138,38 +141,6 @@ public class Main {
         }
 
         /**
-         * 44. 通配符匹配 动态规划
-         *
-         * @param s string
-         * @param p pattern
-         * @return isMath
-         */
-        public boolean isMatch(String s, String p) {
-            int m = s.length();
-            int n = p.length();
-            boolean[][] dp = new boolean[m + 1][n + 1];
-            dp[0][0] = true;
-            for (int i = 1; i <= n; ++i) {
-                if (p.charAt(i - 1) == '*') {
-                    dp[0][i] = true;
-                } else {
-                    break;
-                }
-            }
-            for (int i = 1; i <= m; ++i) {
-                for (int j = 1; j <= n; ++j) {
-                    if (p.charAt(j - 1) == '*') {
-                        // 前一种表示*不匹配任何字符，后一种表示*在当前位置匹配一个字符
-                        dp[i][j] = dp[i][j - 1] || dp[i - 1][j];
-                    } else if (p.charAt(j - 1) == '?' || s.charAt(i - 1) == p.charAt(j - 1)) {
-                        dp[i][j] = dp[i - 1][j - 1];
-                    }
-                }
-            }
-            return dp[m][n];
-        }
-
-        /**
          * 63. 不同路径 II
          *
          * @param obstacleGrid
@@ -301,7 +272,7 @@ public class Main {
             for (int i = 0; i < strs[0].length(); ++i) {
                 char t = strs[0].charAt(i);
                 for (int j = 1; j < len; ++j) {
-                    if ((i < strs[j].length() && strs[j].charAt(i) != t) || i >= strs[j].length()) {
+                    if (i >= strs[j].length() || strs[j].charAt(i) != t) {
                         return res.toString();
                     }
                 }
@@ -326,7 +297,7 @@ public class Main {
                 for (int j = 0; j < m; j++) {
                     if (i < dictionary[j].length())
                         continue;
-                    if (sentence.substring(i - dictionary[j].length(), i).equals(dictionary[j])) {
+                    if (sentence.startsWith(dictionary[j], i - dictionary[j].length())) {
                         dp[i] = Math.max(dp[i - dictionary[j].length()] + dictionary[j].length(), dp[i]);
                     }
                 }
@@ -468,7 +439,7 @@ public class Main {
                 }
                 road.add(column);  //5. 做选择
                 backtrack(road, n, row + 1); //6. 回溯
-                road.remove(road.indexOf(column)); //7. 撤销选择
+                road.remove((Integer) column); //7. 撤销选择
             }
         }
 
@@ -655,11 +626,129 @@ public class Main {
             }
             return res;
         }
+
+//        /**
+//         * 44. 通配符匹配 动态规划
+//         *
+//         * @param s string
+//         * @param p pattern
+//         * @return isMath
+//         */
+//        public boolean isMatch(String s, String p) {
+//            int m = s.length();
+//            int n = p.length();
+//            boolean[][] dp = new boolean[m + 1][n + 1];
+//            dp[0][0] = true;
+//            for (int i = 1; i <= n; ++i) {
+//                if (p.charAt(i - 1) == '*') {
+//                    dp[0][i] = true;
+//                } else {
+//                    break;
+//                }
+//            }
+//            for (int i = 1; i <= m; ++i) {
+//                for (int j = 1; j <= n; ++j) {
+//                    if (p.charAt(j - 1) == '*') {
+//                        // 前一种表示*不匹配任何字符，后一种表示*在当前位置匹配一个字符
+//                        dp[i][j] = dp[i][j - 1] || dp[i - 1][j];
+//                    } else if (p.charAt(j - 1) == '?' || s.charAt(i - 1) == p.charAt(j - 1)) {
+//                        dp[i][j] = dp[i - 1][j - 1];
+//                    }
+//                }
+//            }
+//            return dp[m][n];
+//        }
+
+        public boolean isMatch(String s, String p) {
+            if (s.isEmpty() || p.isEmpty()) {
+                return false;
+            }
+            return matchCore(s, p, 0, 0);
+        }
+
+        public boolean matchCore(String s, String p, int i, int j) {
+            if (i == s.length() - 1 && j == p.length() - 1) {
+                return true;
+            }
+            if (i != s.length() - 1 && j == p.length() - 1) {
+                return false;
+            }
+
+            if (j < p.length() - 1 && p.charAt(j + 1) == '*') {
+                if (s.charAt(i) == p.charAt(j) || (p.charAt(j) == '.' && i != s.length() - 1)) {
+                    return matchCore(s, p, i + 1, j + 2) || matchCore(s, p, i + 1, j) || matchCore(s, p, i, j + 2);
+                } else {
+                    return matchCore(s, p, i, j + 2);
+                }
+            }
+            if (j < p.length() && s.charAt(i) == p.charAt(j) || (p.charAt(j) == '.' && i != s.length() - 1)) {
+                return matchCore(s, p, i + 1, j + 1);
+            }
+            return false;
+        }
+
+        public int reversePairs(int[] nums) {
+            int[] temp = new int[nums.length];
+            return mergeSort(nums, 0, nums.length - 1, temp);
+        }
+
+        public int mergeSort(int[] nums, int left, int right, int[] temp) {
+            if (left < right) {
+                int mid = left + (right - left) / 2;
+                int left_num = mergeSort(nums, left, mid, temp);
+                int right_num = mergeSort(nums, mid + 1, right, temp);
+                return merge(nums, left, mid, right, temp) + left_num + right_num;
+            }
+            return 0;
+        }
+
+        public int merge(int[] nums, int left, int mid, int right, int[] temp) {
+            for (int i = left; i <= right; ++i) {
+                temp[i] = nums[i];
+            }
+            int i = left, j = mid + 1, k = left;
+            int res = 0;
+            while (i <= mid && j <= right) {
+                if (temp[i] < temp[j]) {
+                    nums[k] = temp[i];
+                    ++k;
+                    ++i;
+                    res += k - i;
+                } else {
+                    nums[k] = temp[j];
+                    ++k;
+                    ++j;
+                }
+            }
+            while (i <= mid) {
+                nums[k] = temp[i];
+                ++k;
+                ++i;
+                res += k - i;
+            }
+            while (j <= right) {
+                nums[k] = temp[j];
+                ++k;
+                ++j;
+            }
+            return res;
+        }
     }
 
-
     public static void main(String[] args) {
+        List<Integer> l = new ArrayList<>(10);
+        l.add(1);
+//        l.remove(l.get(l.size() - 1));
+//        l = Collections.synchronizedList(l);
+        Integer[] al = l.toArray(new Integer[0]);
+        System.out.println(al[0]);
         Solution solution = new Solution();
-        System.out.println(solution.lengthOfLongestSubstring1("pwwkew"));
+        String a = "aaaa";
+        a.trim();
+        Vector<Integer> v = new Vector<>();
+        Deque<Integer> deque = new LinkedList<>();
+        LinkedList<Integer> linkedList = new LinkedList<>();
+        int res = solution.reversePairs(new int[]{1, 3, 2, 3, 1});
+        System.out.println(res);
     }
 }
