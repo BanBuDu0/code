@@ -5,6 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
 
@@ -1169,45 +1172,223 @@ public class Main {
             return left;
         }
 
+        public int[][] findContinuousSequence(int target) {
+            List<int[]> res = new ArrayList<>();
+            int left = 1, right = 1;
+            int sum = 0;
+            while (right < (target + 1) / 2) {
+                int in_cur = right;
+                sum += right;
+                right++;
+                while (sum > target) {
+                    int out_cur = left;
+                    sum -= out_cur;
+                    left++;
+                }
+                if (sum == target) {
+                    int[] temp = new int[right - left + 1];
+                    int index = 0;
+                    for (int i = left; i < right; ++i) {
+                        temp[index] = i;
+                        ++index;
+                    }
+                    res.add(temp);
+                }
+            }
+            return res.toArray(new int[res.size()][]);
+        }
+
+        public double[] dicesProbability(int n) {
+            int[][] dp = new int[n][6 * n];
+            for (int i = 0; i < 6; ++i) {
+                dp[0][i] = 1;
+            }
+
+            for (int i = 1; i < n; ++i) {
+                for (int j = i; j < 6 * i; ++j) {
+                    for (int k = 0; k < 6; ++k) {
+                        if (j - k > 0) {
+                            dp[i][j] += dp[i - 1][j - k];
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            double[] res = new double[6 * n];
+            double max = Math.pow(6, n);
+            int index = 0;
+            for (int i = n - 1; i < 6 * n; ++i) {
+                res[index] = dp[n - 1][i] / max;
+                index++;
+            }
+            return res;
+        }
+
+        int i;
+
+        int func() {
+            return i++;
+        }
+
+        int func1() {
+            return func() + func() + func() + func();
+        }
+
+        int func2() {
+            return 4 * func();
+        }
+
+        public int tupleSameProduct(int[] nums) {
+            int len = nums.length;
+            int[][] m = new int[len][len];
+            Arrays.sort(nums);
+
+            int res = 0;
+            for (int l = 0; l < len - 1; ++l) {
+                for (int r = len - 1; r > l; --r) {
+                    int target = nums[l] * nums[r];
+                    int t_l = l + 1, t_r = r - 1;
+                    while (t_l < t_r) {
+                        if (m[t_l][t_r] == 0) {
+                            int c = nums[t_l] * nums[t_r];
+                            m[t_l][t_r] = c;
+                        }
+                        if (m[t_l][t_r] == target) {
+                            t_r--;
+                            t_l++;
+                            res++;
+                        } else if (m[t_l][t_r] > target) {
+                            t_r--;
+                        } else {
+                            t_l++;
+                        }
+                    }
+                }
+            }
+            return res * 8;
+        }
+
+        private AtomicReference<Thread> cas = new AtomicReference<>();
+        private AtomicInteger ticketNum = new AtomicInteger();
+
+        public void lock() {
+            Thread c = Thread.currentThread();
+            while (!cas.compareAndSet(null, c)) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public <E> void printArray(E[] inputArray) {
+            for (E element : inputArray) {
+                System.out.printf("%s ", element);
+            }
+            System.out.println();
+        }
+
+
     }
+
+    class Node {
+        int key, val;
+        Node next, pre;
+
+        Node(int key, int val) {
+            this.key = key;
+            this.val = val;
+        }
+    }
+
+    class DoubleList {
+        Node first, last;
+        int size;
+
+        public DoubleList() {
+            first = new Node(0, 0);
+            last = new Node(0, 0);
+            first.next = last;
+            last.next = first;
+        }
+    }
+
 
     public static void main(String[] args) {
 //        int[] a = new int[]{6, 6, 6, 6, 5, 8};
 //        //小顶堆
-//        PriorityQueue<Integer> q = new PriorityQueue<>((o1, o2) -> o1 - o2);
-//        //大顶堆
-//        PriorityQueue<Integer> q1 = new PriorityQueue<>((o1, o2) -> o2 - o1);
+        PriorityQueue<Integer> q = new PriorityQueue<>((o1, o2) -> o1 - o2);
+        //大顶堆
+        PriorityQueue<Integer> q1 = new PriorityQueue<>((o1, o2) -> o2 - o1);
 //        //队列
-
-
-        //队列
-        Queue<Integer> arrayDeque = new ArrayDeque<>();
-        Queue<Integer> linkedListQueue = new LinkedList<>();
-
-        //双端队列
-        Deque<Integer> arrayDeque1 = new ArrayDeque<>();
-        Deque<Integer> deque = new LinkedList<>();
-        LinkedList<Integer> linkedList = new LinkedList<>();
-
-        List<Integer> list = new ArrayList<>();
-        LinkedHashMap<Integer, String> linkedHashMap = new LinkedHashMap<>();
-
-        Map<Integer, Character> m = new TreeMap<>(Comparator.reverseOrder());
-        Map<Integer, Integer> map = new HashMap<>();
-        Map<Integer, Integer> hashTable = new Hashtable<>();
-
-        //集合
-        Set<Integer> set = new HashSet<>();
-        Set<Integer> treeSet = new TreeSet<>();
-        // 栈，继承自Vector，线程安全
-        Stack<Integer> stack = new Stack<>();
-        String string = new String("");
+        String a = "";
         StringBuilder stringBuilder = new StringBuilder();
+        StringBuffer stringBuffer = new StringBuffer();
+//        //队列
+//        Queue<Integer> arrayDeque = new ArrayDeque<>();
+//        Queue<Integer> linkedListQueue = new LinkedList<>();
+//
+//        //双端队列
+        Deque<Integer> arrayDeque1 = new ArrayDeque<>();
+//        Deque<Integer> deque = new LinkedList<>();
+//        LinkedList<Integer> linkedList = new LinkedList<>();
+//
+//        List<Integer> list = new ArrayList<>();
+//        LinkedHashMap<Integer, String> linkedHashMap = new LinkedHashMap<>();
+//
+        Map<Integer, Character> m = new TreeMap<>(Comparator.reverseOrder());
+        List<int[]> list = new ArrayList<>();
+        list.toArray(new int[list.size()][]);
 
-        Vector<Integer> v = new Vector<>();
+//        Map<Integer, Integer> map = new HashMap<>();
+//        Map<Integer, Integer> hashTable = new Hashtable<>();
+//
+//        //集合
+//        Set<Integer> set = new HashSet<>();
+//        Set<Integer> treeSet = new TreeSet<>();
+//        // 栈，继承自Vector，线程安全
+//        Stack<Integer> stack = new Stack<>();
+//        String string = new String("");
+//        StringBuilder stringBuilder = new StringBuilder();
 
+//        Vector<Integer> v = new Vector<>();
+//        byte[] allocation1, allocation2,allocation3,allocation4,allocation5;
+//        allocation1 = new byte[Integer.MAX_VALUE];
+//        allocation2 = new byte[2000*1024];
+//        allocation3 = new byte[1000*1024];
+//        allocation4 = new byte[1000*1024];
+//        allocation5 = new byte[1000*1024];
 
-//        Solution solution = new Solution();
-//        System.out.println(solution);
+        Solution solution = new Solution();
+        System.out.println(solution.tupleSameProduct(new int[]{2, 3, 4, 6}));
+
+//        List<Integer> list1 = new ArrayList<>();
+//
+//        list1.add(1);
+//        list1.add(2);
+////这里直接添加会报错
+////        list1.add("a");
+//        Class<? extends List> clazz = list1.getClass();
+//        Method add = null;
+//        try {
+//            add = clazz.getDeclaredMethod("add", Object.class);
+//            add.invoke(list1, "kl");
+//            System.out.println(list1.get(0));
+//        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+//            e.printStackTrace();
+//        }
+
+        ArrayList<String> list1 = new ArrayList<String>();
+        list1.add("abc");
+
+        ArrayList<Integer> list2 = new ArrayList<Integer>();
+        list2.add(123);
+        solution.printArray(new Integer[]{1, 23, 4});
+
+        System.out.println(list1.getClass() == list2.getClass());
+
     }
 }
