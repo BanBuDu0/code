@@ -3,6 +3,7 @@ package com.syj;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.channels.Selector;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -1169,6 +1170,50 @@ public class Main {
             return left;
         }
 
+        public int strToInt(String str) {
+            char[] s = str.toCharArray();
+            int len = s.length;
+            if (len == 0) {
+                return 0;
+            }
+            int i = 0;
+            while (i < len && s[i] == ' ') {
+                i++;
+            }
+            if (i == len) {
+                return 0;
+            }
+            int flag = 1;
+            if (s[i] == '+') {
+                ++i;
+            } else if (s[i] == '-') {
+                flag = -1;
+                ++i;
+            }
+            int res = 0;
+            for (; i < len; ++i) {
+                if (!(s[i] >= '0' && s[i] <= '9')) {
+                    break;
+                }
+                if (res > Integer.MAX_VALUE / 10) {
+                    return flag == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+                } else if (res == Integer.MAX_VALUE / 10) {
+                    if (flag == 1) {
+                        if (s[i] - '0' > 7) {
+                            return Integer.MAX_VALUE;
+                        }
+                    } else {
+                        if (s[i] - '0' > 8) {
+                            return Integer.MIN_VALUE;
+                        }
+                    }
+                }
+
+                res = res * 10 + (s[i] - '0');
+            }
+            return res * flag;
+        }
+
     }
 
     public static void main(String[] args) {
@@ -1205,9 +1250,19 @@ public class Main {
         StringBuilder stringBuilder = new StringBuilder();
 
         Vector<Integer> v = new Vector<>();
-
-
-//        Solution solution = new Solution();
-//        System.out.println(solution);
+        System.out.println(Integer.MIN_VALUE % 10);
+        System.out.println(Integer.MAX_VALUE % 10);
+        Solution solution = new Solution();
+        String s1 = new String("计算机");
+        String s2 = s1.intern();
+        String s3 = "计算机";
+        System.out.println(s2);//计算机
+        System.out.println(s1 == s2);//false，因为一个是堆内存中的 String 对象一个是常量池中的 String 对象，
+        System.out.println(s3 == s2);//true，因为两个都是常量池中的 String 对象
+//
+//        Integer a = 100;
+//        Integer b = new Integer(100);
+//
+//        System.out.println(a == b);
     }
 }
